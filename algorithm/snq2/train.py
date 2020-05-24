@@ -132,7 +132,7 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
                   pl, op, lr_anneal_factor, beta_anneal_factor, beta_threshold):
     if update_schedule == 'dynamic':
         if not is_update_close:
-            update_frequency = int(max(update_frequency * 0.75, update_frequency_lb))
+            update_frequency = int(max(update_frequency * 0.8, update_frequency_lb))
         else:
             q.lr *= 0.8
             q_kl.lr *= 0.8
@@ -140,7 +140,7 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
             op.beta *= 0.8
             pl.beta_op *= 0.8
             op.beta_op *= 0.8
-            update_frequency = int(min(update_frequency * 1.3, update_frequency_ub))
+            update_frequency = int(min(update_frequency * 1.25, update_frequency_ub))
     q.lr *= lr_anneal_factor
     q_kl.lr *= lr_anneal_factor
     beta = max(pl.beta * beta_anneal_factor, beta_threshold)

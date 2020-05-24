@@ -27,9 +27,9 @@ for schedule in ['dynamic']:
                        '/snq2/reward_' + \
                        prior_init + '_' + \
                        schedule + '_' + \
-                       str(init_update_freq) + '_' + str(init_lr) + '.pkl'
+                       str(init_update_freq) + '_' + str(init_lr) + '_' + str(i) + '.pkl'
         info = 'prior:' + prior_init + '| schedule:' + schedule + '| init_update_freq: ' + str(
-            init_update_freq) + '| init_lr:' + str(init_lr) + '| No.' + str(i + 1) + '/' + total_run
+            init_update_freq) + '| init_lr:' + str(init_lr) + '| No.' + str(i + 1) + '/' + str(total_run)
         policies, cumulative_reward = train(game,
                                             evaluator,
                                             log_file,
