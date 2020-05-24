@@ -2,7 +2,7 @@ import pickle
 
 from util.matrix_game_solver import *
 
-THRESHOLD = 0.2
+THRESHOLD = 0.1
 
 
 class ReferencePolicy:
@@ -60,10 +60,10 @@ class ReferencePolicy:
                 '''
                 '''
                 for action in range(self.n_actions):
-                    if self.reference_policy[0][state][action] < 0.1:
-                        self.reference_policy[0][state][action] = 0.1
-                    if self.reference_policy[1][state][action] < 0.1:
-                        self.reference_policy[1][state][action] = 0.1
+                    if self.reference_policy[0][state][action] < 0.01:
+                        self.reference_policy[0][state][action] = 0.01
+                    if self.reference_policy[1][state][action] < 0.01:
+                        self.reference_policy[1][state][action] = 0.01
 
                 self.reference_policy[0][state] = self.normalize(self.reference_policy[0][state])
                 self.reference_policy[1][state] = self.normalize(self.reference_policy[1][state])

@@ -4,23 +4,22 @@ from environment.low_dim_PEG import *
 
 env = LowDimPEG()
 game = PEGGame(env)
-prior_init = 'uniform'
+prior_init = 'quasi-nash'
 init_update_freq = 10000
-# prior = 'quasi-nash'
 ground_truth_policies_file = 'data/LowDimensionPEG/nash_values.pkl'
 ground_truth_values_file = 'data/LowDimensionPEG/nash_policies.pkl'
 policies_file = 'data/' + env.get_name() + '/snq2_policies_' + prior_init + '.pkl'
 prior_file = 'data/' + env.get_name() + '/prior.pkl'
 evaluator = PolicyEvaluator(env, ground_truth_policies_file, ground_truth_values_file)
-init_lr = 0.1
-for schedule in [ 'dynamic']:
+init_lr = 0.15
+for schedule in ['dynamic']:
     for i in range(5):
         log_file = 'data/' + \
                    env.get_name() + \
                    '/snq2/log_' + \
                    prior_init + '_' + \
                    schedule + '_' + \
-                   str(init_update_freq) + '_' + str(init_lr) + '.csv'
+                   str(init_update_freq) + '_' + str(init_lr) + '_polyak.csv'
 
         policies, cumulative_reward = train(game,
                                             evaluator,
@@ -28,9 +27,9 @@ for schedule in [ 'dynamic']:
                                             policies_file,
                                             env.is_terminal_state,  # just to make life easier
                                             lr=init_lr,
-                                            lr_anneal_factor=0.9,
+                                            lr_anneal_factor=0.8,
                                             verbose=True,
-                                            beta_op=-20, beta_pl=20,
+                                            beta_op=-5, beta_pl=5,
                                             update_frequency=init_update_freq,
                                             update_frequency_ub=25000,
                                             update_frequency_lb=5000,
@@ -39,7 +38,8 @@ for schedule in [ 'dynamic']:
                                             evaluate_frequency=1000,
                                             reference_init=prior_init,
                                             prior_file=prior_file,
-                                            update_schedule=schedule)
+                                            update_schedule=schedule,
+                                            epsilon=0.6)
         f = open('data/' + env.get_name() + '/snq2/rewards_' + prior_init + '_' + schedule + '_' + str(i) + '.pkl',
                  'wb')
         pickle.dump(cumulative_reward, f)

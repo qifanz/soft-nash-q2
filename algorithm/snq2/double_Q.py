@@ -46,5 +46,5 @@ class DoubleQ:
 
     def estimate_nash_of_state(self, state):
         matrix_game = self.get_matrix_game(state)
-        value, _, _ = linprog_solve(matrix_game)
+        value = value_solve(matrix_game)
         return value

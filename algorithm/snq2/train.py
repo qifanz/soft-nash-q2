@@ -96,7 +96,8 @@ def train(game,
                 print('     average reward', average_reward)
                 print("     Correct %", len(res[0]) / (len(res[0]) + len(res[1])), '[', len(res[0]), '/',
                       (len(res[0]) + len(res[1])), ']')
-                print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'max', max(res[2]))
+                if len(res[2])!=0:
+                    print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'max', max(res[2]))
                 print('used', time.time() - start)
                 write_log(episode, time.time() - start, max_q_update,
                           episode_steps / evaluate_frequency, average_reward, len(res[0]), log_file)
@@ -129,7 +130,7 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
                   pl, op, lr_anneal_factor, beta_anneal_factor, beta_threshold):
     if update_schedule == 'dynamic':
         if not is_update_close:
-            update_frequency = int(max(update_frequency * 0.8, update_frequency_lb))
+            update_frequency = int(max(update_frequency * 0.75, update_frequency_lb))
         else:
             q.lr *= 0.8
             q_kl.lr *= 0.8
@@ -137,7 +138,7 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
             op.beta *= 0.8
             pl.beta_op *= 0.8
             op.beta_op *= 0.8
-            update_frequency = int(min(update_frequency * 1.25, update_frequency_ub))
+            update_frequency = int(min(update_frequency * 1.3, update_frequency_ub))
     q.lr *= lr_anneal_factor
     q_kl.lr *= lr_anneal_factor
     beta = max(pl.beta * beta_anneal_factor, beta_threshold)
