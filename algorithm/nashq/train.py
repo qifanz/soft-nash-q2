@@ -18,6 +18,7 @@ def train(game,
           epsilon=0.2,
           verbose=False,
           with_validation=True,
+          run_info='*'
           ):
     start = time.time()
 
@@ -67,6 +68,7 @@ def train(game,
             if verbose:
                 average_reward = np.mean(cumulative_rewards[-evaluate_frequency:])
                 print('-----------------------------------------------')
+                print(run_info)
                 print('[episode', episode, '/', total_n_episodes, ']')
                 print('     Q diff', max_q_update)
                 print('     average step', episode_steps / evaluate_frequency)

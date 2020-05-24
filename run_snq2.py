@@ -21,7 +21,7 @@ for schedule in [ 'dynamic']:
                    prior_init + '_' + \
                    schedule + '_' + \
                    str(init_update_freq) + '_' + str(init_lr) + '.csv'
-
+        info='prior: '+prior_init+' schedule: '+schedule+' init_update_freq: '+str(init_update_freq)+' init_lr:'+str(init_lr)+ ' No.'+str(i+1)
         policies, cumulative_reward = train(game,
                                             evaluator,
                                             log_file,
@@ -39,7 +39,8 @@ for schedule in [ 'dynamic']:
                                             evaluate_frequency=1000,
                                             reference_init=prior_init,
                                             prior_file=prior_file,
-                                            update_schedule=schedule)
+                                            update_schedule=schedule,
+                                            run_info=info)
         f = open('data/' + env.get_name() + '/snq2/rewards_' + prior_init + '_' + schedule + '_' + str(i) + '.pkl',
                  'wb')
         pickle.dump(cumulative_reward, f)

@@ -29,7 +29,8 @@ def train(game,
           with_validation=True,
           reference_init='uniform',
           prior_file='',
-          update_schedule='dynamic'
+          update_schedule='dynamic',
+          run_info='*'
           ):
     if fixed_beta_episode is None:
         fixed_beta_episode = int(0.7 * total_n_episodes)
@@ -90,6 +91,7 @@ def train(game,
             if verbose:
                 average_reward = np.mean(cumulative_rewards[-evaluate_frequency:])
                 print('-----------------------------------------------')
+                print(run_info)
                 print('[episode', episode, '/', total_n_episodes, ']')
                 print('     Q diff', max_q_update)
                 print('     average step', episode_steps / evaluate_frequency)
