@@ -13,15 +13,23 @@ policies_file = 'data/' + env.get_name() + '/snq2_policies_' + prior_init + '.pk
 prior_file = 'data/' + env.get_name() + '/prior.pkl'
 evaluator = PolicyEvaluator(env, ground_truth_policies_file, ground_truth_values_file)
 init_lr = 0.1
-for schedule in [ 'dynamic']:
-    for i in range(5):
+total_run = 5
+for schedule in ['dynamic']:
+    for i in range(total_run):
         log_file = 'data/' + \
                    env.get_name() + \
                    '/snq2/log_' + \
                    prior_init + '_' + \
                    schedule + '_' + \
                    str(init_update_freq) + '_' + str(init_lr) + '.csv'
-        info='prior: '+prior_init+' schedule: '+schedule+' init_update_freq: '+str(init_update_freq)+' init_lr:'+str(init_lr)+ ' No.'+str(i+1)
+        rewards_file = 'data/' + \
+                       env.get_name() + \
+                       '/snq2/reward_' + \
+                       prior_init + '_' + \
+                       schedule + '_' + \
+                       str(init_update_freq) + '_' + str(init_lr) + '.pkl'
+        info = 'prior:' + prior_init + '| schedule:' + schedule + '| init_update_freq: ' + str(
+            init_update_freq) + '| init_lr:' + str(init_lr) + '| No.' + str(i + 1) + '/' + total_run
         policies, cumulative_reward = train(game,
                                             evaluator,
                                             log_file,
@@ -41,7 +49,6 @@ for schedule in [ 'dynamic']:
                                             prior_file=prior_file,
                                             update_schedule=schedule,
                                             run_info=info)
-        f = open('data/' + env.get_name() + '/snq2/rewards_' + prior_init + '_' + schedule + '_' + str(i) + '.pkl',
-                 'wb')
+        f = open(rewards_file, 'wb')
         pickle.dump(cumulative_reward, f)
         f.close()
