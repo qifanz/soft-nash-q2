@@ -12,6 +12,7 @@ evaluator = PolicyEvaluator(env, ground_truth_policies_file, ground_truth_values
 init_lr = 0.1
 for i in range(5):
     log_file = 'data/' + env.get_name() + '/nashq/log' + str(init_lr) + '.csv'
+    reward_file = 'data/' + env.get_name() + '/nashq/reward' + str(init_lr) + '.pkl'
     policies, cumulative_reward = train(game,
                                         evaluator,
                                         log_file,
@@ -24,6 +25,6 @@ for i in range(5):
                                         total_n_episodes=200001,
                                         evaluate_frequency=2000
                                         )
-    f = open('data/' + env.get_name() + '/nashq/rewards_' + str(i) + '.pkl', 'wb')
+    f = open(reward_file, 'wb')
     pickle.dump(cumulative_reward, f)
     f.close()
