@@ -8,6 +8,7 @@ class NashPlayer:
         self.index = index
         self.n_actions = n_actions
         self.epsilon = epsilon
+        self.policy = {}
 
     def choose_action(self, state):
         if np.random.uniform() >= self.epsilon:
@@ -16,6 +17,7 @@ class NashPlayer:
             return np.random.choice(np.arange(0, self.n_actions), p=np.divide(np.ones(self.n_actions), self.n_actions))
 
     def get_policy(self, state):
+        '''
         M = self.Q.get_matrix_game(state)
 
         # res[0] = value, res[1] = player, res[2] = opponent
@@ -24,12 +26,17 @@ class NashPlayer:
         policy = np.divide(policy, np.sum(policy))
         policy = np.nan_to_num(policy)
         return policy
+        '''
+        return self.policy.get(state, np.divide(np.ones(self.n_actions), self.n_actions))
 
     def observe(self, reward, state, action_self, action_opponent, new_state):
-        self.Q.update(reward, state, action_self, action_opponent, new_state, self)
+        self.Q.update(reward, state, action_self, action_opponent, new_state)
 
     def generate_all_policies(self, n_states):
         policies = []
         for state in range(n_states):
             policies.append(self.get_policy(state))
         return policies
+
+    def update_policy(self,state,new_p):
+        self.policy[state]=new_p

@@ -44,7 +44,9 @@ def train(game,
             action_pl = player.choose_action(state)
             action_op = opponent.choose_action(state)
             new_state, reward, is_terminated, info = game.step(action_pl, action_op)
-            q.update(reward, state, action_pl, action_op, new_state, player)
+            px, py = q.update(reward, state, action_pl, action_op, new_state)
+            player.update_policy(new_state, px)
+            opponent.update_policy(new_state, py)
             state = new_state
             reward_episode += reward
             if is_terminated:
