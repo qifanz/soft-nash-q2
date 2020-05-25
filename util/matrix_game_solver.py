@@ -7,8 +7,8 @@ from scipy.optimize import linprog
 # warnings.filterwarnings('ignore', '.*Ill-conditioned*')
 
 
-def __linprog_solver_col(value_matrix):
-    value_matrix = np.nan_to_num(np.round(value_matrix, 4))
+def __linprog_solver_col(value_matrix, precision=4):
+    value_matrix = np.nan_to_num(np.round(value_matrix, precision))
     m, n = value_matrix.shape
 
     # solve col
@@ -50,21 +50,21 @@ def __linprog_solver_col(value_matrix):
     return res['x'][:-1], -res['fun']
 
 
-def __linprog_solver_row(value_matrix):
-    policy, value = __linprog_solver_col(-value_matrix.T)
+def __linprog_solver_row(value_matrix, precision=4):
+    policy, value = __linprog_solver_col(-value_matrix.T, precision)
     return policy, -value
 
 
-def value_solve(value_matrix):
-    _, value = __linprog_solver_row(value_matrix)
+def value_solve(value_matrix, precision=4):
+    _, value = __linprog_solver_col(value_matrix, precision)
     return value
 
 
-def linprog_solve(value_matrix):
+def linprog_solve(value_matrix, precision=4):
     # rps = nash.Game(np.array(value_matrix))
     # eqs = rps.support_enumeration()
-    px, value = __linprog_solver_row(value_matrix)
-    py, v2 = __linprog_solver_col(value_matrix)
+    px, value = __linprog_solver_row(value_matrix,precision)
+    py, v2 = __linprog_solver_col(value_matrix,precision)
     # policy_x, policy_y = list(eqs)[0]
     # value = rps[policy_x,policy_y][0]
     return value, py, px

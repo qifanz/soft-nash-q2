@@ -19,9 +19,9 @@ for i in range(5):
                                         policies_file,
                                         env.is_terminal_state,  # just to make life easier
                                         lr=init_lr,
-                                        lr_anneal_factor=0.8,
+                                        lr_anneal_factor=0.9,
                                         verbose=True,
-                                        update_frequency=20000,
+                                        update_frequency=10000,
                                         total_n_episodes=200001,
                                         evaluate_frequency=2000
                                         )

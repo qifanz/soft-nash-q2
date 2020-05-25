@@ -5,7 +5,7 @@ from environment.low_dim_PEG import *
 env = LowDimPEG()
 game = PEGGame(env)
 prior_init = 'quasi-nash'
-init_update_freq = 10000
+init_update_freq = 20000
 ground_truth_policies_file = 'data/LowDimensionPEG/nash_values.pkl'
 ground_truth_values_file = 'data/LowDimensionPEG/nash_policies.pkl'
 policies_file = 'data/' + env.get_name() + '/snq2_policies_' + prior_init + '.pkl'
@@ -35,14 +35,14 @@ for schedule in ['dynamic']:
                                             policies_file,
                                             env.is_terminal_state,  # just to make life easier
                                             lr=init_lr,
-                                            lr_anneal_factor=0.8,
+                                            lr_anneal_factor=0.9,
                                             verbose=True,
-                                            beta_op=-5, beta_pl=5,
+                                            beta_op=-25, beta_pl=15,
                                             update_frequency=init_update_freq,
                                             update_frequency_ub=25000,
-                                            update_frequency_lb=5000,
+                                            update_frequency_lb=10000,
                                             prior_update_factor=0,
-                                            total_n_episodes=200001, fixed_beta_episode=160000,
+                                            total_n_episodes=300001, fixed_beta_episode=260000,
                                             evaluate_frequency=1000,
                                             reference_init=prior_init,
                                             prior_file=prior_file,

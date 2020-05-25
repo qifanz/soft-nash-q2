@@ -24,7 +24,7 @@ def train(game,
           nash_requency=10,
           beta_pl=20, beta_op=-20,
           beta_threshold=0.1,
-          epsilon=0.2,
+          epsilon=0.25,
           verbose=False,
           with_validation=True,
           reference_init='uniform',
@@ -78,7 +78,7 @@ def train(game,
         current_update = np.max(np.abs(np.subtract(q.Q, Q_copy)))
         max_q_update = max(max_q_update, current_update)
 
-        epsilon_annealed = max(epsilon * (1 - 1.2 * episode / total_n_episodes), 0)
+        epsilon_annealed = max(epsilon * (1 - 0.5 * episode / total_n_episodes), 0)
         player.epsilon = epsilon_annealed
         opponent.epsilon = epsilon_annealed
 
@@ -87,6 +87,7 @@ def train(game,
                 valid_start = time.time()
                 policies = gen_policies(player, opponent, game, None)
                 res = evaluator.validate(policies)
+                reference_res = evaluator.validate(reference_policy.reference_policy)
                 start += (time.time() - valid_start)  # recompense evaluation time
             if verbose:
                 average_reward = np.mean(cumulative_rewards[-evaluate_frequency:])
@@ -98,8 +99,12 @@ def train(game,
                 print('     average reward', average_reward)
                 print("     Correct %", len(res[0]) / (len(res[0]) + len(res[1])), '[', len(res[0]), '/',
                       (len(res[0]) + len(res[1])), ']')
-                if len(res[2])!=0:
-                    print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'max', max(res[2]))
+                print("     Correct %", len(reference_res[0]) / (len(reference_res[0]) + len(reference_res[1])), '[',
+                      len(reference_res[0]), '/',
+                      (len(reference_res[0]) + len(reference_res[1])), ']')
+                if len(res[2]) != 0:
+                    print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'median', np.median(res[2]),
+                          'max', max(res[2]))
                 print('used', time.time() - start)
                 write_log(episode, time.time() - start, max_q_update,
                           episode_steps / evaluate_frequency, average_reward, len(res[0]), log_file)
@@ -140,15 +145,16 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
             op.beta *= 0.8
             pl.beta_op *= 0.8
             op.beta_op *= 0.8
+            beta = max(pl.beta * beta_anneal_factor, beta_threshold)
+            beta_op = max(op.beta * beta_anneal_factor, beta_threshold)
+            pl.beta = beta
+            op.beta = beta_op
+            pl.beta_op = beta_op
+            op.beta_op = beta
             update_frequency = int(min(update_frequency * 1.25, update_frequency_ub))
     q.lr *= lr_anneal_factor
     q_kl.lr *= lr_anneal_factor
-    beta = max(pl.beta * beta_anneal_factor, beta_threshold)
-    beta_op = max(op.beta * beta_anneal_factor, beta_threshold)
-    pl.beta = beta
-    op.beta = beta_op
-    pl.beta_op = beta_op
-    op.beta_op = beta
+
     return update_frequency, q, q_kl, pl, op
 
 

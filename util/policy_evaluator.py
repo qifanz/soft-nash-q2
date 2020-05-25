@@ -26,7 +26,7 @@ class PolicyEvaluator:
                 correct_states.append(state)
             else:
                 incorrect_states.append(state)
-                deviations.append(deviation)
+            deviations.append(deviation)
         return correct_states, incorrect_states, deviations
 
     def validate_state(self, state, polciy2Evaluate):
@@ -36,16 +36,20 @@ class PolicyEvaluator:
         # return correct_op and correct_pl
         # else:
         matrix_game = self.create_matrix_game(state)
+        nash_value = self.nash_values[state]
         value = np.dot(np.dot(polciy2Evaluate[0][state], matrix_game), polciy2Evaluate[1][state].T)
-        diff = math.fabs(math.fabs(value - self.nash_values[state]) / self.nash_values[state])
-
         value2 = max(np.dot(matrix_game, polciy2Evaluate[1][state]))
         value3 = min(np.dot(polciy2Evaluate[0][state], matrix_game))
+        if math.fabs(nash_value) < 0.01:
+            diff = math.fabs(value)
+            diff1 = math.fabs(value2)
+            diff2 = math.fabs(value3)
+        else:
+            diff = math.fabs(math.fabs(value - nash_value) / nash_value)
+            diff1 = math.fabs(math.fabs(nash_value - value2) / nash_value)
+            diff2 = math.fabs(math.fabs(nash_value - value3) / nash_value)
 
-        diff1 = math.fabs(math.fabs(value - value2) / value)
-        diff2 = math.fabs(math.fabs(value - value3) / value)
-
-        return diff < 0.1 and diff1 < 0.1 and diff2 < 0.1, max(diff, diff1, diff2)
+        return diff < 0.01 and diff1 < 0.01 and diff2 < 0.01, max(diff, diff1, diff2)
 
     def create_matrix_game(self, state):
         n_actions = self.env.get_n_actions()
