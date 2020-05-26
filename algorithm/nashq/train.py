@@ -57,7 +57,7 @@ def train(game,
         current_update = np.max(np.abs(np.subtract(q.Q, Q_copy)))
         max_q_update = max(max_q_update, current_update)
 
-        epsilon_annealed = max(epsilon * (1 - 0.5 * episode / total_n_episodes), 0)
+        epsilon_annealed = max(epsilon * (1 - 1.1 * episode / total_n_episodes), 0)
         player.epsilon = epsilon_annealed
         opponent.epsilon = epsilon_annealed
 
@@ -77,7 +77,8 @@ def train(game,
                 print('     average reward', average_reward)
                 print("     Correct %", len(res[0]) / (len(res[0]) + len(res[1])), '[', len(res[0]), '/',
                       (len(res[0]) + len(res[1])), ']')
-                print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'median', np.median(res[2]),'max', max(res[2]))
+                print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'median', np.median(res[2]), 'max',
+                      max(res[2]))
                 print('used', time.time() - start)
                 write_log(episode, time.time() - start, max_q_update,
                           episode_steps / evaluate_frequency, average_reward, len(res[0]), log_file)
@@ -92,7 +93,8 @@ def train(game,
     if with_validation:
         res = evaluator.validate(policies)
         print("Correct %", len(res[0]) / (len(res[0]) + len(res[1])), len(res[0]), '/', (len(res[0]) + len(res[1])))
-        print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'median', np.median(res[2]),'max', max(res[2]))
+        print('     Deviation min', min(res[2]), 'average', np.mean(res[2]), 'median', np.median(res[2]), 'max',
+              max(res[2]))
 
     print('Training used in total', time.time() - start)
     return policies, cumulative_rewards

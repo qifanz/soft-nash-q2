@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 
 SOFTQ_POLICY_FILE = '../data/policies_single_q.pkl'
-
+THRESHOLD = 0.03
 
 class PolicyEvaluator:
     def __init__(self, env, ground_truth_policies_file, ground_truth_values_file, gamma=0.9):
@@ -40,7 +40,7 @@ class PolicyEvaluator:
         value = np.dot(np.dot(polciy2Evaluate[0][state], matrix_game), polciy2Evaluate[1][state].T)
         value2 = max(np.dot(matrix_game, polciy2Evaluate[1][state]))
         value3 = min(np.dot(polciy2Evaluate[0][state], matrix_game))
-        if math.fabs(nash_value) < 0.01:
+        if math.fabs(nash_value) <= 0.001:
             diff = math.fabs(value)
             diff1 = math.fabs(value2)
             diff2 = math.fabs(value3)
@@ -49,7 +49,7 @@ class PolicyEvaluator:
             diff1 = math.fabs(math.fabs(nash_value - value2) / nash_value)
             diff2 = math.fabs(math.fabs(nash_value - value3) / nash_value)
 
-        return diff < 0.01 and diff1 < 0.01 and diff2 < 0.01, max(diff, diff1, diff2)
+        return diff < THRESHOLD and diff1 < THRESHOLD and diff2 < THRESHOLD, max(diff, diff1, diff2)
 
     def create_matrix_game(self, state):
         n_actions = self.env.get_n_actions()

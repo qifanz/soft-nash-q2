@@ -35,7 +35,8 @@ def train(game,
     if fixed_beta_episode is None:
         fixed_beta_episode = int(0.7 * total_n_episodes)
     if beta_anneal_factor is None:
-        beta_anneal_factor = math.pow(0.2 / beta_pl, update_frequency / fixed_beta_episode)
+        beta_anneal_factor = math.pow(0.5 / beta_pl, update_frequency / fixed_beta_episode)
+        # beta_anneal_factor = (beta_pl - 0.5) / (fixed_beta_episode / update_frequency)
 
     start = time.time()
 
@@ -49,11 +50,14 @@ def train(game,
 
     cumulative_rewards = []
     total_steps = 0
-
     episode_steps = 0
     max_q_update = 0
 
-    next_update_episode = update_frequency
+    if reference_init == 'quasi-nash':
+        next_update_episode = update_frequency * 1.5
+    else:
+        next_update_episode = update_frequency
+
     for episode in range(total_n_episodes):
         state = game.reset()
         Q_copy = q.Q.copy()
@@ -78,7 +82,7 @@ def train(game,
         current_update = np.max(np.abs(np.subtract(q.Q, Q_copy)))
         max_q_update = max(max_q_update, current_update)
 
-        epsilon_annealed = max(epsilon * (1 - 0.5 * episode / total_n_episodes), 0)
+        epsilon_annealed = max(epsilon * (1 - 1.1 * episode / total_n_episodes), 0)
         player.epsilon = epsilon_annealed
         opponent.epsilon = epsilon_annealed
 
@@ -139,12 +143,12 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
         if not is_update_close:
             update_frequency = int(max(update_frequency * 0.8, update_frequency_lb))
         else:
-            q.lr *= 0.8
-            q_kl.lr *= 0.8
-            pl.beta *= 0.8
-            op.beta *= 0.8
-            pl.beta_op *= 0.8
-            op.beta_op *= 0.8
+            q.lr *= 0.9
+            q_kl.lr *= 0.9
+            pl.beta *= 0.9
+            op.beta *= 0.9
+            pl.beta_op *= 0.9
+            op.beta_op *= 0.9
             beta = max(pl.beta * beta_anneal_factor, beta_threshold)
             beta_op = max(op.beta * beta_anneal_factor, beta_threshold)
             pl.beta = beta
@@ -152,9 +156,18 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
             pl.beta_op = beta_op
             op.beta_op = beta
             update_frequency = int(min(update_frequency * 1.25, update_frequency_ub))
-    q.lr *= lr_anneal_factor
-    q_kl.lr *= lr_anneal_factor
+        q.lr *= lr_anneal_factor
+        q_kl.lr *= lr_anneal_factor
 
+    else:
+        beta = max(pl.beta * beta_anneal_factor, beta_threshold)
+        beta_op = max(op.beta * beta_anneal_factor, beta_threshold)
+        pl.beta = beta
+        op.beta = beta_op
+        pl.beta_op = beta_op
+        op.beta_op = beta
+        q.lr *= lr_anneal_factor
+        q_kl.lr *= lr_anneal_factor
     return update_frequency, q, q_kl, pl, op
 
 

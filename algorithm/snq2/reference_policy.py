@@ -2,7 +2,7 @@ import pickle
 
 from util.matrix_game_solver import *
 
-THRESHOLD = 0.1
+THRESHOLD = 0.01
 
 
 class ReferencePolicy:
