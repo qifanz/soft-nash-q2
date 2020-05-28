@@ -83,6 +83,9 @@ class HighDimEnv:
     def is_terminal_state(self, state):
         return state in self.terminal_states
 
+    def is_non_terminal_state(self, state):
+        return state in self.non_terminal_states
+
     def get_n_states(self):
         '''
         Get the number of states of the game

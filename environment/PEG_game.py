@@ -19,9 +19,6 @@ class PEGGame:
     def get_n_states(self):
         return self.peg_env.get_n_states()
 
-    def is_terminal_state(self, state):
-        return self.peg_env.is_terminal_state(state)
-
     def step(self, action_pl, action_op):
         reward = self.peg_env.get_state_reward(self.current_state)
         if self.peg_env.is_terminal_state(self.current_state):  # if terminal state, return reason

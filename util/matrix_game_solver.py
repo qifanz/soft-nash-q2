@@ -65,6 +65,10 @@ def linprog_solve(value_matrix, precision=4):
     # eqs = rps.support_enumeration()
     px, value = __linprog_solver_row(value_matrix,precision)
     py, v2 = __linprog_solver_col(value_matrix,precision)
+    px = np.divide(px, np.sum(px))
+    px = np.nan_to_num(px)
+    py = np.divide(py, np.sum(py))
+    py = np.nan_to_num(py)
     # policy_x, policy_y = list(eqs)[0]
     # value = rps[policy_x,policy_y][0]
     return value, py, px

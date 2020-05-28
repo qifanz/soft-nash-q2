@@ -19,14 +19,13 @@ class PolicyEvaluator:
         incorrect_states = []
         deviations = []
         for state in range(self.env.get_n_states()):
-            if self.env.is_terminal_state(state):
-                continue
-            is_correct, deviation = self.validate_state(state, polciy2Evaluate)
-            if is_correct:
-                correct_states.append(state)
-            else:
-                incorrect_states.append(state)
-            deviations.append(deviation)
+            if self.env.is_non_terminal_state(state):
+                is_correct, deviation = self.validate_state(state, polciy2Evaluate)
+                if is_correct:
+                    correct_states.append(state)
+                else:
+                    incorrect_states.append(state)
+                deviations.append(deviation)
         return correct_states, incorrect_states, deviations
 
     def validate_state(self, state, polciy2Evaluate):
@@ -40,7 +39,7 @@ class PolicyEvaluator:
         value = np.dot(np.dot(polciy2Evaluate[0][state], matrix_game), polciy2Evaluate[1][state].T)
         value2 = max(np.dot(matrix_game, polciy2Evaluate[1][state]))
         value3 = min(np.dot(polciy2Evaluate[0][state], matrix_game))
-        if math.fabs(nash_value) <= 0.001:
+        if math.fabs(nash_value) <= 0.01:
             diff = math.fabs(value)
             diff1 = math.fabs(value2)
             diff2 = math.fabs(value3)

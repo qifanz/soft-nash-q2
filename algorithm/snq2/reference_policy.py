@@ -79,7 +79,7 @@ class ReferencePolicy:
     def get_reference_state_action(self, index, state, action):
         return self.reference_policy[index][state][action]
 
-    def update_reference(self, Q, factor, is_terminal_state):
+    def update_reference(self, Q, is_terminal_state,factor=0, precision=4):
         superior_threshold_count = 0
         inferior_threshold_count = 0
         for state in range(self.n_states):
@@ -87,12 +87,14 @@ class ReferencePolicy:
                 continue
             matrix_game = Q.get_matrix_game(state)
             old_value = np.dot(np.dot(self.reference_policy[0][state], matrix_game), self.reference_policy[1][state])
-            value, policy_1, policy_2 = linprog_solve(matrix_game)
-            self.reference_policy[0][state] = np.divide(
-                np.add(np.multiply(self.reference_policy[0][state], factor), policy_1), factor + 1)
-            self.reference_policy[1][state] = np.divide(
-                np.add(np.multiply(self.reference_policy[1][state], factor), policy_2), factor + 1)
+            value, policy_1, policy_2 = linprog_solve(matrix_game, precision=precision)
+            self.reference_policy[0][state] = self.normalize(
+                np.add(np.multiply(self.reference_policy[0][state], 1-factor), np.multiply(policy_1, factor)))
+            self.reference_policy[1][state] = self.normalize(
+                np.add(np.multiply(self.reference_policy[1][state], 1-factor), np.multiply(policy_2, factor)))
             deviation = np.fabs(np.fabs(old_value - value) / value)
+            if np.fabs(value) < 0.001:
+                deviation = np.fabs(old_value)
             if deviation <= THRESHOLD:
                 inferior_threshold_count += 1
             else:

@@ -60,28 +60,14 @@ class LowDimPEG:
             return True
         return False
 
-    def get_state_absorbing_type(self, state):
-        if not self.is_terminal_state(state):
-            raise Exception("State is not an absorbing state")
-        return self.terminal_type[state]
-
-    def get_absorbing_type_reward(self, type):
-        if type == 0:
-            return CRASH_REWARD
-        elif type == 1:
-            return -CRASH_REWARD
-        elif type == 2:
-            return END_REWARD
-        elif type == 3:
-            return EVASION_REWARD
-        else:
-            raise Exception("Absorbing type error")
-
     def is_crash_state(self, state):
         return state in self.crash_states_p1 or state in self.crash_states_p2
 
     def is_terminal_state(self, state):
         return state in self.terminal_states
+
+    def is_non_terminal_state(self, state):
+        return state in self.non_terminal_states
 
     def get_n_states(self):
         '''
@@ -166,31 +152,6 @@ class LowDimPEG:
         :return: transition matrix given that pair of action
         '''
         return self.transitions[(action_pair[0], action_pair[1])]
-
-    def __convert_transition(self):
-        from_mapping = []  # state -> {next_state : {action pair : prob}}, from state to next state
-        to_mapping = []  # from previous state to state
-        for state in range(self.get_n_states()):
-            from_mapping.append({})
-            to_mapping.append({})
-            for i in range(N_ACTIONS):
-                for j in range(N_ACTIONS):
-                    from_vector = self.get_state_transition((i, j))[state]
-                    to_vector = self.get_state_transition((i, j))[:, state]
-                    for next_state in range(len(from_vector)):
-                        probability = from_vector[next_state]
-                        if probability != 0:
-                            if next_state not in from_mapping[state]:
-                                from_mapping[state][next_state] = {}
-                            from_mapping[state][next_state][(i, j)] = probability
-
-                    for previous_state in range(len(to_vector)):
-                        probability = from_vector[previous_state]
-                        if probability != 0:
-                            if previous_state not in to_mapping[state]:
-                                to_mapping[state][previous_state] = {}
-                            to_mapping[state][previous_state][(i, j)] = probability
-        return from_mapping, to_mapping
 
     def rc2state(self, row1, col1, row2, col2):
         '''

@@ -25,13 +25,13 @@ class Q:
     def get_matrix_game(self, state):
         return self.Q[state]
 
-    def update(self, reward, state, action, action_op, new_state):
+    def update(self, reward, state, action, action_op, new_state, precision=4):
         # only update once, when its "Player"
         if new_state is None:
             self.Q[state] = np.ones((self.n_actions, self.n_actions)) * reward
             return np.divide(np.ones(self.n_actions), self.n_actions), np.divide(np.ones(self.n_actions), self.n_actions)
         else:
-            value_new_state, px, py = linprog_solve(self.get_matrix_game(new_state))
+            value_new_state, px, py = linprog_solve(self.get_matrix_game(new_state), precision)
             self.Q[state, action, action_op] += self.lr * (
                     reward + self.discount_factor * value_new_state - self.Q[
                 state, action, action_op])

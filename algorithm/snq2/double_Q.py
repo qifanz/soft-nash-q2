@@ -22,7 +22,7 @@ class DoubleQ:
     def get_matrix_game(self, state):
         return self.Q[state]
 
-    def update(self, reward, state, action, action_op, new_state, player, using_nash=False):
+    def update(self, reward, state, action, action_op, new_state, player, using_nash=False, precision=4):
         if player.index == 0:
             # only update once, when its "Player"
             if new_state is not None:
@@ -32,7 +32,7 @@ class DoubleQ:
                         state, action, action_op])
                 else:
                     self.Q[state, action, action_op] += self.lr * (
-                            reward + self.discount_factor * self.estimate_nash_of_state(new_state) - self.Q[
+                            reward + self.discount_factor * self.estimate_nash_of_state(new_state, precision=precision) - self.Q[
                         state, action, action_op])
             else:
                 self.Q[state] = np.ones((self.n_actions, self.n_actions)) * reward
@@ -44,7 +44,7 @@ class DoubleQ:
         value = np.dot(np.dot(policy_player, matrix_game), policy_op)
         return value
 
-    def estimate_nash_of_state(self, state):
+    def estimate_nash_of_state(self, state, precision=4):
         matrix_game = self.get_matrix_game(state)
-        value = value_solve(matrix_game)
+        value = value_solve(matrix_game,precision=precision)
         return value

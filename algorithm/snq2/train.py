@@ -30,7 +30,8 @@ def train(game,
           reference_init='uniform',
           prior_file='',
           update_schedule='dynamic',
-          run_info='*'
+          run_info='*',
+          precision=4
           ):
     if fixed_beta_episode is None:
         fixed_beta_episode = int(0.7 * total_n_episodes)
@@ -54,7 +55,7 @@ def train(game,
     max_q_update = 0
 
     if reference_init == 'quasi-nash':
-        next_update_episode = update_frequency * 1.5
+        next_update_episode = update_frequency * 1  # 1.5
     else:
         next_update_episode = update_frequency
 
@@ -71,7 +72,7 @@ def train(game,
             new_state, reward, is_terminated, info = game.step(action_pl, action_op)
             q_kl.update(reward, state, action_pl, action_op, new_state, player)
             use_nash_update = total_steps % nash_requency == 0
-            q.update(reward, state, action_pl, action_op, new_state, player, use_nash_update)
+            q.update(reward, state, action_pl, action_op, new_state, player, use_nash_update, precision=precision)
             state = new_state
             reward_episode += reward
             if is_terminated:
@@ -117,7 +118,8 @@ def train(game,
 
         if episode == next_update_episode:
             print('update at', episode)
-            is_update_close = reference_policy.update_reference(q, prior_update_factor, is_terminal_state)
+            is_update_close = reference_policy.update_reference(q, is_terminal_state, factor=prior_update_factor,
+                                                                precision=precision)
             update_frequency, q, q_kl, player, opponent = update_params(update_schedule, is_update_close,
                                                                         update_frequency, update_frequency_lb,
                                                                         update_frequency_ub, q, q_kl, player, opponent,

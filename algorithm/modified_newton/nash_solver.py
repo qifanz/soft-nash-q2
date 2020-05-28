@@ -1,8 +1,6 @@
+import math
 import pickle
-import time
 import warnings
-
-import numpy as np
 
 from util.matrix_game_solver import *
 
@@ -12,7 +10,7 @@ DEBUG = False
 
 
 class NashSolver:
-    def __init__(self, env, nash_value_file, nash_policy_file):
+    def __init__(self, env, nash_value_file, nash_policy_file, precision=4):
         self.env = env
         self.value_file = nash_value_file
         self.policy_file = nash_policy_file
@@ -22,6 +20,7 @@ class NashSolver:
         self.gamma = 0.9
         self.beta = 0.9
         self.value_vector = env.rewards  # set initial estimation to rewards
+        self.precision = precision
 
     def solve(self):
         converge_flag = False
@@ -31,7 +30,7 @@ class NashSolver:
             L_v, policy = self.__calc_L()
             psi_v = self.__calc_psi(L_v, self.value_vector)
             J_v = self.__calc_J(psi_v)
-            if J_v <= 10e-5:
+            if J_v <= math.pow(10, -self.precision):
                 converge_flag = True
             else:
                 D_k, I_subtract_P = self.__cal_D(policy, psi_v)
@@ -46,7 +45,9 @@ class NashSolver:
                         w = self.mu * w
                         k += 1
             print('iteration ', iteration)
-
+        for i, v in enumerate(self.value_vector):
+            if v < math.pow(10, -self.precision):
+                self.value_vector[i] = 0
         f = open(self.value_file, "wb")
         pickle.dump(self.value_vector, f)
         f.close()
@@ -78,7 +79,7 @@ class NashSolver:
         end = time.time()
         self.debug(['Create M used', end - start])
         start = time.time()
-        value, policy_x, policy_y = linprog_solve(np.array(action_value_matrix))
+        value, policy_x, policy_y = linprog_solve(np.array(action_value_matrix), precision=self.precision)
         end = time.time()
         self.debug(['Linprog solver used', end - start])
         return policy_x, policy_y, value
