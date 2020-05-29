@@ -92,9 +92,10 @@ class ReferencePolicy:
                 np.add(np.multiply(self.reference_policy[0][state], 1-factor), np.multiply(policy_1, factor)))
             self.reference_policy[1][state] = self.normalize(
                 np.add(np.multiply(self.reference_policy[1][state], 1-factor), np.multiply(policy_2, factor)))
-            deviation = np.fabs(np.fabs(old_value - value) / value)
             if np.fabs(value) < 0.001:
                 deviation = np.fabs(old_value)
+            else:
+                deviation = np.fabs(np.fabs(old_value - value) / value)
             if deviation <= THRESHOLD:
                 inferior_threshold_count += 1
             else:

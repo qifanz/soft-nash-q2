@@ -41,8 +41,11 @@ class Player:
         for action in range(self.n_actions):
             prob = self.get_reference_self(state, action) * math.exp(self.beta * self.marginalize(state, action))
             action_possibility.append(prob)
-            normalizer += prob
-        policy = np.divide(action_possibility, normalizer)
+        policy = np.divide(action_possibility, np.sum(action_possibility))
+        for i,p in enumerate(policy):
+            if p<10e-8:
+                policy[i]=0
+        policy = np.divide(policy, np.sum(policy))
         return np.nan_to_num(policy)
 
     def get_reference_self(self, state, action):

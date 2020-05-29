@@ -11,7 +11,7 @@ def train(game,
           log_file,
           policies_file,
           is_terminal_state,
-          prior_update_factor=0,
+          prior_update_factor=1, #0 to 1
           beta_anneal_factor=None,
           lr=0.1,
           lr_anneal_factor=0.9,

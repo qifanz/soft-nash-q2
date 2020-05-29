@@ -36,7 +36,14 @@ class Q:
                     reward + self.discount_factor * value_new_state - self.Q[
                 state, action, action_op])
             px = np.divide(px, np.sum(px))
+            for i,p in enumerate(px):
+                if p<10e-5: px[i]= 0
             px = np.nan_to_num(px)
             py = np.divide(py, np.sum(py))
+            for i,p in enumerate(py):
+                if p<10e-5: py[i]= 0
             py = np.nan_to_num(py)
+            px = np.divide(px, np.sum(px))
+            py = np.divide(py, np.sum(py))
+
             return px, py

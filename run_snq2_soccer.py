@@ -7,7 +7,7 @@ from environment.soccer_game import SoccerGame
 env = SoccerEnv()
 game = SoccerGame(env)
 prior_init = 'uniform'
-init_update_freq = 4000
+init_update_freq = 5000
 # prior = 'quasi-nash'
 ground_truth_policies_file = 'data/'+env.get_name()+'/nash_values.pkl'
 ground_truth_values_file = 'data/'+env.get_name()+'/nash_policies.pkl'
@@ -38,20 +38,21 @@ for schedule in ['dynamic']:
                                             policies_file,
                                             env.is_terminal_state,  # just to make life easier
                                             lr=init_lr,
-                                            lr_anneal_factor=0.9,
+                                            lr_anneal_factor=0.95,
                                             verbose=True,
-                                            beta_op=-5, beta_pl=5,
+                                            beta_op=-10, beta_pl=10,
                                             update_frequency=init_update_freq,
-                                            update_frequency_ub=8000,
-                                            update_frequency_lb=2000,
-                                            prior_update_factor=0,
-                                            total_n_episodes=50001, fixed_beta_episode=45000,
+                                            update_frequency_ub=10000,
+                                            update_frequency_lb=2500,
+                                            prior_update_factor=1,
+                                            total_n_episodes=100001, fixed_beta_episode=85000,
                                             evaluate_frequency=1000,
                                             reference_init=prior_init,
                                             prior_file=prior_file,
                                             update_schedule=schedule,
                                             run_info=info,
-                                            precision=4)
+                                            epsilon=0.3,
+                                            precision=5)
         f = open(rewards_file, 'wb')
         pickle.dump(cumulative_reward, f)
         f.close()

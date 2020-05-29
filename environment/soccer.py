@@ -3,8 +3,8 @@ from math import floor
 import numpy as np
 
 TERMINAL_BLOCKS = [[(1, 0), (2, 0)], [(1, 3), (2, 3)]]
-REWARD = 100
-
+REWARD = 5
+OFFSET_REWARD = -0.05
 
 class SoccerEnv:
     def __init__(self):
@@ -212,14 +212,14 @@ class SoccerEnv:
                         rewards.append(REWARD)
                         terminal_states.append(i)
                     else:
-                        rewards.append(0)
+                        rewards.append(OFFSET_REWARD)
                         non_terminal_states.append(i)
                 else:
                     if (row2, col2) in TERMINAL_BLOCKS[1]:
                         rewards.append(-REWARD)
                         terminal_states.append(i)
                     else:
-                        rewards.append(0)
+                        rewards.append(-OFFSET_REWARD)
                         non_terminal_states.append(i)
 
         return states, terminal_states, non_terminal_states, rewards

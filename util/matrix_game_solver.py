@@ -42,11 +42,13 @@ def __linprog_solver_col(value_matrix, precision=4):
         bounds.append((0, 1))
     bounds.append((None, None))
 
+    options = {'cholesky': False,
+               'sym_pos': False,
+               'lstsq': True,
+               'presolve': True},
+
     res = linprog(C, A_ub=A, b_ub=B, A_eq=A_eq, b_eq=B_eq, bounds=bounds,
-                  options={'cholesky': False,
-                           'sym_pos': False,
-                           'lstsq': True,
-                           'presolve': True})
+                  method='revised simplex')
     return res['x'][:-1], -res['fun']
 
 
@@ -63,8 +65,8 @@ def value_solve(value_matrix, precision=4):
 def linprog_solve(value_matrix, precision=4):
     # rps = nash.Game(np.array(value_matrix))
     # eqs = rps.support_enumeration()
-    px, value = __linprog_solver_row(value_matrix,precision)
-    py, v2 = __linprog_solver_col(value_matrix,precision)
+    px, value = __linprog_solver_row(value_matrix, precision)
+    py, v2 = __linprog_solver_col(value_matrix, precision)
     px = np.divide(px, np.sum(px))
     px = np.nan_to_num(px)
     py = np.divide(py, np.sum(py))

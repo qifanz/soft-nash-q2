@@ -6,7 +6,7 @@ from environment.soccer_game import SoccerGame
 
 env = SoccerEnv()
 game = SoccerGame(env)
-init_update_freq = 4000
+init_update_freq = 5000
 # prior = 'quasi-nash'
 ground_truth_policies_file = 'data/'+env.get_name()+'/nash_values.pkl'
 ground_truth_values_file = 'data/'+env.get_name()+'/nash_policies.pkl'
@@ -31,12 +31,13 @@ for i in range(total_run):
                                         policies_file,
                                         env.is_terminal_state,  # just to make life easier
                                         lr=init_lr,
-                                        lr_anneal_factor=0.9,
+                                        lr_anneal_factor=0.95,
                                         verbose=True,
                                         update_frequency=init_update_freq,
-                                        total_n_episodes=300001,
+                                        total_n_episodes=100001,
                                         evaluate_frequency=1000,
                                         precision=4,
+                                        epsilon=0.5,
                                         run_info=info)
     f = open(rewards_file, 'wb')
     pickle.dump(cumulative_reward, f)
