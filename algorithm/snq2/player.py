@@ -24,7 +24,11 @@ class Player:
 
     def choose_action(self, state):
         if np.random.uniform() >= self.epsilon:
-            return np.random.choice(np.arange(0, self.n_actions), p=self.get_policy(state))
+            try:
+                return np.random.choice(np.arange(0, self.n_actions), p=self.get_policy(state))
+            except ValueError:
+                print(state, self.get_policy(state))
+
         else:
             return np.random.choice(np.arange(0, self.n_actions), p=np.divide(np.ones(self.n_actions), self.n_actions))
 
@@ -37,15 +41,11 @@ class Player:
 
     def get_policy(self, state):
         action_possibility = []
-        normalizer = 0
         for action in range(self.n_actions):
             prob = self.get_reference_self(state, action) * math.exp(self.beta * self.marginalize(state, action))
             action_possibility.append(prob)
         policy = np.divide(action_possibility, np.sum(action_possibility))
-        for i,p in enumerate(policy):
-            if p<10e-8:
-                policy[i]=0
-        policy = np.divide(policy, np.sum(policy))
+
         return np.nan_to_num(policy)
 
     def get_reference_self(self, state, action):

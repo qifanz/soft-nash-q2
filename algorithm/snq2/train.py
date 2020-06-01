@@ -11,7 +11,7 @@ def train(game,
           log_file,
           policies_file,
           is_terminal_state,
-          prior_update_factor=1, #0 to 1
+          prior_update_factor=1,  # 0 to 1
           beta_anneal_factor=None,
           lr=0.1,
           lr_anneal_factor=0.9,
@@ -23,7 +23,7 @@ def train(game,
           update_frequency_lb=5000,
           nash_requency=10,
           beta_pl=20, beta_op=-20,
-          beta_threshold=0.1,
+          beta_threshold=0.05,
           epsilon=0.25,
           verbose=False,
           with_validation=True,
@@ -36,7 +36,7 @@ def train(game,
     if fixed_beta_episode is None:
         fixed_beta_episode = int(0.7 * total_n_episodes)
     if beta_anneal_factor is None:
-        beta_anneal_factor = math.pow(0.5 / beta_pl, update_frequency / fixed_beta_episode)
+        beta_anneal_factor = math.pow(beta_threshold / beta_pl, update_frequency / fixed_beta_episode)
         # beta_anneal_factor = (beta_pl - 0.5) / (fixed_beta_episode / update_frequency)
 
     start = time.time()
@@ -53,9 +53,9 @@ def train(game,
     total_steps = 0
     episode_steps = 0
     max_q_update = 0
-
+    previous_q = q.Q.copy()
     if reference_init == 'quasi-nash':
-        next_update_episode = update_frequency * 1  # 1.5
+        next_update_episode = update_frequency * 1.5  # 1.5
     else:
         next_update_episode = update_frequency
 
@@ -83,7 +83,7 @@ def train(game,
         current_update = np.max(np.abs(np.subtract(q.Q, Q_copy)))
         max_q_update = max(max_q_update, current_update)
 
-        epsilon_annealed = max(epsilon * (1 - 1.1 * episode / total_n_episodes), 0)
+        epsilon_annealed = max(epsilon * (1 - episode / 1.5 / total_n_episodes), 0)
         player.epsilon = epsilon_annealed
         opponent.epsilon = epsilon_annealed
 
@@ -118,7 +118,8 @@ def train(game,
 
         if episode == next_update_episode:
             print('update at', episode)
-            is_update_close = reference_policy.update_reference(q, is_terminal_state, factor=prior_update_factor,
+            is_update_close = reference_policy.update_reference(q, previous_q, is_terminal_state,
+                                                                factor=prior_update_factor,
                                                                 precision=precision)
             update_frequency, q, q_kl, player, opponent = update_params(update_schedule, is_update_close,
                                                                         update_frequency, update_frequency_lb,
@@ -128,6 +129,17 @@ def train(game,
 
             next_update_episode += update_frequency
             print('update frequency switched to', update_frequency)
+            previous_q = q.Q.copy()
+            '''
+            if episode >= 80000:
+                f = open('debug_q_' + str(episode) + '.pkl', 'wb')
+                pickle.dump(q.Q, f)
+                f.close()
+                f = open('debug_prior_' + str(episode) + '.pkl', 'wb')
+                pickle.dump(reference_policy.reference_policy, f)
+                f.close()
+                gen_policies(player, opponent, game, 'debug_policy_' + str(episode) + '.pkl')
+            '''
 
     policies = gen_policies(player, opponent, game, policies_file)
     if with_validation:
@@ -145,12 +157,12 @@ def update_params(update_schedule, is_update_close, update_frequency, update_fre
         if not is_update_close:
             update_frequency = int(max(update_frequency * 0.8, update_frequency_lb))
         else:
-            q.lr *= 0.9
-            q_kl.lr *= 0.9
-            pl.beta *= 0.9
-            op.beta *= 0.9
-            pl.beta_op *= 0.9
-            op.beta_op *= 0.9
+            # q.lr *= 0.9
+            # q_kl.lr *= 0.9
+            # pl.beta *= 0.9
+            # op.beta *= 0.9
+            # pl.beta_op *= 0.9
+            # op.beta_op *= 0.9
             beta = max(pl.beta * beta_anneal_factor, beta_threshold)
             beta_op = max(op.beta * beta_anneal_factor, beta_threshold)
             pl.beta = beta

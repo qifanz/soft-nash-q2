@@ -16,7 +16,7 @@ train(game,
       evaluator,
       log_file,
       policies_file,
-      env.is_terminal_state,  # just to make life easier
+      env.is_non_terminal_state,  # just to make life easier
       lr=0.2,
       lr_anneal_factor=0.95,
       verbose=True,

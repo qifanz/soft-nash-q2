@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Player:
-    def __init__(self, index, n_states, n_actions, delta_w, delta_l, lr, epsilon=0.2):
+    def __init__(self, index, n_states, n_actions, delta_w, delta_l, lr, epsilon=0.3, update_frequency=100):
         self.index = index
         self.n_states = n_states
         self.n_actions = n_actions
@@ -17,6 +17,7 @@ class Player:
             self.average_policy.append(self.normalize(np.ones(self.n_actions)))
         self.counter = np.zeros(n_states)
         self.lr = lr
+        self.update_frequency = update_frequency
 
     def normalize(self, policy):
         policy = np.divide(policy, np.sum(policy))
@@ -42,12 +43,14 @@ class Player:
         self.update_policy(state, action)
 
     def update_q(self, state, action, reward, next_state):
+        self.counter[state] += 1
         if state is None:
             self.Q[state] = np.ones((self.n_actions, self.n_actions)) * reward
         else:
-            self.Q[state, action] = (1 - self.lr) * self.Q[state, action] + self.lr * (
+            lr_decreased = 1 / (1 + int(+self.counter[state] / self.update_frequency)) * self.lr
+            # otherwise it decays too fast!
+            self.Q[state, action] = (1 - lr_decreased) * self.Q[state, action] + lr_decreased * (
                     reward + 0.9 * np.max(self.Q[next_state]))
-        self.counter[state] += 1
 
     def update_average_policy(self, state):
         count_state = self.counter[state]
@@ -65,6 +68,7 @@ class Player:
             delta = self.delta_w
         else:
             delta = self.delta_l
+        delta = 1 / (1 + int(+self.counter[state] / self.update_frequency)) * delta  # same, otherwise it decays too fast!
         if should_increment:
             self.policies[state][action] += delta
         else:

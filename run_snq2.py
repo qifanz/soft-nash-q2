@@ -34,7 +34,7 @@ for schedule in ['dynamic']:
                                             evaluator,
                                             log_file,
                                             policies_file,
-                                            env.is_terminal_state,  # just to make life easier
+                                            env.is_non_terminal_state,  # just to make life easier
                                             lr=init_lr,
                                             lr_anneal_factor=0.95,
                                             verbose=True,
@@ -42,7 +42,7 @@ for schedule in ['dynamic']:
                                             update_frequency=init_update_freq,
                                             update_frequency_ub=20000,
                                             update_frequency_lb=5000,
-                                            prior_update_factor=0,
+                                            prior_update_factor=1,
                                             total_n_episodes=300001, fixed_beta_episode=260000,
                                             evaluate_frequency=1000,
                                             reference_init=prior_init,

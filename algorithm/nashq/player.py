@@ -27,7 +27,7 @@ class NashPlayer:
         policy = np.nan_to_num(policy)
         return policy
         '''
-        return self.policy.get(state, np.divide(np.ones(self.n_actions), self.n_actions))
+        return np.nan_to_num(self.policy.get(state, np.divide(np.ones(self.n_actions), self.n_actions)))
 
     def observe(self, reward, state, action_self, action_opponent, new_state):
         self.Q.update(reward, state, action_self, action_opponent, new_state)
@@ -39,4 +39,4 @@ class NashPlayer:
         return policies
 
     def update_policy(self,state,new_p):
-        self.policy[state]=new_p
+        self.policy[state]=np.divide(new_p, np.sum(new_p))

@@ -4,7 +4,7 @@ from environment.high_dim_PEG import HighDimEnv
 
 env = HighDimEnv()
 game = PEGGame(env)
-prior_init = 'uniform'
+prior_init = 'quasi-nash'
 # prior = 'quasi-nash'
 ground_truth_policies_file = 'data/' + env.get_name() + '/nash_values.pkl'
 ground_truth_values_file = 'data/' + env.get_name() + '/nash_policies.pkl'
@@ -15,7 +15,7 @@ schedule = 'dynamic'
 init_lr = 0.2
 total_run = 5
 for i in range(total_run):
-    for init_update_freq in [30000]:
+    for init_update_freq in [25000]:
         log_file = 'data/' + \
                    env.get_name() + \
                    '/snq2/log_' + \
@@ -36,13 +36,13 @@ for i in range(total_run):
                                             policies_file,
                                             env.is_non_terminal_state,  # just to make life easier
                                             lr=0.2,
-                                            lr_anneal_factor=0.95,
+                                            lr_anneal_factor=0.9,
                                             verbose=True,
-                                            beta_op=-50, beta_pl=50,
+                                            beta_op=-25, beta_pl=25,
                                             update_frequency=init_update_freq,
-                                            update_frequency_ub=60000,
-                                            update_frequency_lb=15000,
-                                            prior_update_factor=0,
+                                            update_frequency_ub=init_update_freq * 1.5,
+                                            update_frequency_lb=int(init_update_freq / 2),
+                                            prior_update_factor=0.7,
                                             total_n_episodes=600001, fixed_beta_episode=500000,
                                             reference_init=prior_init,
                                             prior_file=prior_file,

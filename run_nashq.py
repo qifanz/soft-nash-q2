@@ -20,14 +20,15 @@ for i in range(total_runs):
                                         evaluator,
                                         log_file,
                                         policies_file,
-                                        env.is_terminal_state,  # just to make life easier
+                                        env.is_non_terminal_state,  # just to make life easier
                                         lr=init_lr,
                                         lr_anneal_factor=lr_anneal_factor,
                                         verbose=True,
                                         update_frequency=10000,
                                         total_n_episodes=300001,
                                         evaluate_frequency=2000,
-                                        run_info=info
+                                        run_info=info,
+
                                         )
     f = open(reward_file, 'wb')
     pickle.dump(cumulative_reward, f)

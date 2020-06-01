@@ -1,21 +1,22 @@
 from algorithm.snq2.train import *
 from environment.PEG_game import *
-from environment.high_dim_PEG import HighDimEnv
+from environment.det_peg import DetPEG
+from environment.low_dim_PEG import *
 
-env = HighDimEnv()
+env = DetPEG()
 game = PEGGame(env)
-prior_init = 'uniform'
+prior_init = 'quasi-nash'
+init_update_freq = 10000
 # prior = 'quasi-nash'
-ground_truth_policies_file = 'data/' + env.get_name() + '/nash_values.pkl'
-ground_truth_values_file = 'data/' + env.get_name() + '/nash_policies.pkl'
+ground_truth_policies_file = 'data/'+env.get_name()+'/nash_values.pkl'
+ground_truth_values_file = 'data/'+env.get_name()+'/nash_policies.pkl'
 policies_file = 'data/' + env.get_name() + '/snq2_policies_' + prior_init + '.pkl'
 prior_file = 'data/' + env.get_name() + '/prior.pkl'
 evaluator = PolicyEvaluator(env, ground_truth_policies_file, ground_truth_values_file)
-schedule = 'dynamic'
 init_lr = 0.2
 total_run = 5
-for i in range(total_run):
-    for init_update_freq in [30000]:
+for schedule in ['dynamic']:
+    for i in range(total_run):
         log_file = 'data/' + \
                    env.get_name() + \
                    '/snq2/log_' + \
@@ -35,15 +36,17 @@ for i in range(total_run):
                                             log_file,
                                             policies_file,
                                             env.is_non_terminal_state,  # just to make life easier
-                                            lr=0.2,
-                                            lr_anneal_factor=0.95,
+                                            lr=init_lr,
+                                            lr_anneal_factor=0.99,
                                             verbose=True,
-                                            beta_op=-50, beta_pl=50,
+                                            beta_op=-10, beta_pl=10,
                                             update_frequency=init_update_freq,
-                                            update_frequency_ub=60000,
-                                            update_frequency_lb=15000,
-                                            prior_update_factor=0,
-                                            total_n_episodes=600001, fixed_beta_episode=500000,
+                                            update_frequency_ub=20000,
+                                            update_frequency_lb=5000,
+                                            prior_update_factor=0.5,
+                                            total_n_episodes=300001, fixed_beta_episode=150000,
+                                            evaluate_frequency=1000,
+                                            epsilon=0.5,
                                             reference_init=prior_init,
                                             prior_file=prior_file,
                                             update_schedule=schedule,

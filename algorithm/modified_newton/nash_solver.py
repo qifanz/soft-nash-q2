@@ -46,7 +46,7 @@ class NashSolver:
                         k += 1
             print('iteration ', iteration)
         for i, v in enumerate(self.value_vector):
-            if v < math.pow(10, -self.precision):
+            if np.fabs(v) < math.pow(10, -self.precision):
                 self.value_vector[i] = 0
         f = open(self.value_file, "wb")
         pickle.dump(self.value_vector, f)

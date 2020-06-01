@@ -2,14 +2,15 @@ from math import floor
 
 import numpy as np
 
-TERMINAL_BLOCKS = [[(1, 0), (2, 0)], [(1, 3), (2, 3)]]
-REWARD = 5
-OFFSET_REWARD = -0.05
+TERMINAL_BLOCKS = [[(1, 0), (2, 0)], [(1, 4), (2, 4)]]
+REWARD = 10
+OFFSET_REWARD = -0.1
+
 
 class SoccerEnv:
     def __init__(self):
         self.n_rows = 4
-        self.n_cols = 4
+        self.n_cols = 5
         self.n_actions = 5
         self.states, self.terminal_states, self.non_terminal_states, self.rewards = self._init_states()
         self.transitions = self._init_transitions()
@@ -31,6 +32,9 @@ class SoccerEnv:
 
     def get_state_reward(self, state):
         return self.rewards[state]
+
+    def get_terminal_states(self):
+        return self.terminal_states
 
     def get_non_terminal_states(self):
         return self.non_terminal_states
@@ -162,7 +166,7 @@ class SoccerEnv:
         for action1 in range(self.n_actions):
             for action2 in range(self.n_actions):
                 transitions[(action1, action2)] = np.zeros((2 * n_blocks ** 2, 2 * n_blocks ** 2))
-                for state in range(n_blocks ** 2):
+                for state in range(2 * n_blocks ** 2):
                     if state in self.non_terminal_states:
                         new_states = self.get_next_states(state, action1, action2)
                         for new_state in new_states:

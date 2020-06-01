@@ -20,35 +20,36 @@ for schedule in ['dynamic']:
                    '/snq2/log_' + \
                    prior_init + '_' + \
                    schedule + '_' + \
-                   str(init_update_freq) + '_' + str(init_lr) + '.csv'
+                   str(init_update_freq) + '_' + str(init_lr) + '_final.csv'
         rewards_file = 'data/' + \
                        env.get_name() + \
                        '/snq2/reward_' + \
                        prior_init + '_' + \
                        schedule + '_' + \
-                       str(init_update_freq) + '_' + str(init_lr) + '_' + str(i) + '.pkl'
+                       str(init_update_freq) + '_' + str(init_lr) + '_' + str(i) + '_final.pkl'
         info = 'prior:' + prior_init + '| schedule:' + schedule + '| init_update_freq: ' + str(
             init_update_freq) + '| init_lr:' + str(init_lr) + '| No.' + str(i + 1) + '/' + str(total_run)
         policies, cumulative_reward = train(game,
                                             evaluator,
                                             log_file,
                                             policies_file,
-                                            env.is_terminal_state,  # just to make life easier
+                                            env.is_non_terminal_state,  # just to make life easier
                                             lr=init_lr,
-                                            lr_anneal_factor=0.95,
+                                            lr_anneal_factor=0.9,
                                             verbose=True,
-                                            beta_op=-25, beta_pl=25,
+                                            prior_update_factor=0.5,
+                                            beta_op=-10, beta_pl=10,
                                             update_frequency=init_update_freq,
-                                            update_frequency_ub=20000,
-                                            update_frequency_lb=5000,
-                                            prior_update_factor=0,
+                                            update_frequency_ub=init_update_freq * 1.5,
+                                            update_frequency_lb=init_update_freq * 0.5,
                                             total_n_episodes=300001, fixed_beta_episode=260000,
                                             evaluate_frequency=1000,
                                             reference_init=prior_init,
                                             prior_file=prior_file,
                                             update_schedule=schedule,
-                                            epsilon=0.6,
-                                            run_info=info)
+                                            epsilon=0.5,
+                                            run_info=info,
+                                            )
         f = open(rewards_file, 'wb')
         pickle.dump(cumulative_reward, f)
         f.close()
