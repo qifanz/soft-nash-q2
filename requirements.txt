@@ -1,5 +1,5 @@
 gym==0.10.5
 numpy
-scipy==1.4.1
+scipy==1.10.0
 matplotlib
 six==1.14.0
